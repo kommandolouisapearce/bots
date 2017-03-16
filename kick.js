@@ -19,16 +19,16 @@ function httpsget(host, path, type) {
 		for(var i = 0; i < groups.length; i++) {
 			console.log(groups[i]['id'] + ' ' + groups[i]['name'])
 		}
-		//console.log(groups);
 	  });
 	});
 	req.end();
 }
 
-function listUsers(path) {
+
+function sendRequest(host, path, onDataFunction, onEndFunction) {
 	var https = require('https');
 	var options = {
-	  hostname:  'slack.com',
+	  hostname: host,
 	  port: 443,
 	  path: path,
 	  method: 'GET'
@@ -36,20 +36,23 @@ function listUsers(path) {
 	var buffer = '';
 	var req = https.request(options, function (res) {
 		res.setEncoding('utf8');
-	  res.on('data', function (d)  {
-		buffer = buffer + d;
-	  });
-	  res.on('end', function (d)  {
-		var myjs = JSON.parse(buffer);
-		var groups = myjs['members'];
-		for(var i = 0; i < groups.length; i++) {
-			console.log(groups[i]['id'] + ' ' + groups[i]['name'] + ' ' + groups[i]['team_id'])
-		}
-	  });
+	  res.on('data', onDataFunction);
+	  res.on('end', onEndFunction);
 	});
 	req.end();
 }
 
+function test(host, path, type) {
+	sendRequest(host, path, function (d)  {
+			buffer = buffer + d;
+		  }, 
+		function (d)  {
+			var myjs = JSON.parse(buffer);
+			var groups = myjs[type];
+			for(var i = 0; i < groups.length; i++) {
+				console.log(groups[i]['id'] + ' ' + groups[i]['name'])
+			}});
+}
 
 /*function manageUser(path) {
 	var https = require('https');
@@ -110,18 +113,6 @@ module.exports = function (token, url) {
 }*/
 
 
-
-
-//httpsget(hostname, group_path , 'groups');
-//httpsget(hostname, channel_path, 'channels');
-//listUsers('/api/users.list?token=' + token);
-
-
-//manageUser('/api/channels.kick?token=' + token + '&channel=' + channel + '&user=' + user);
-//manageUser('/api/channels.invite?token=' + token + '&channel=' + channel + '&user=' + 'user);
-//manageUser('/api/groups.kick?token=' + token + '&channel=' + group + '&user=' + user);
-//manageUser('/api/groups.invite?token=' + token + '&channel=' + group + '&user=' + user);
-
 var token = '';
 var channel = '';
 var group = '';
@@ -133,7 +124,16 @@ var group_method = '/api/groups.list?';
 var group_path = group_method  +  'token=' + token;
 
 var channel_method = '/api/channels.list?';
-var channel_path = channel_method + 'token=' + token';
+var channel_path = channel_method + 'token=' + token;
 
 
+//httpsget(hostname, group_path , 'groups');
+//httpsget(hostname, channel_path, 'channels');
+//httpsget(hostname,('/api/users.list?token=' + token,'members');
+
+
+//manageUser('/api/channels.kick?token=' + token + '&channel=' + channel + '&user=' + user);
+//manageUser('/api/channels.invite?token=' + token + '&channel=' + channel + '&user=' + 'user);
+//manageUser('/api/groups.kick?token=' + token + '&channel=' + group + '&user=' + user);
+//manageUser('/api/groups.invite?token=' + token + '&channel=' + group + '&user=' + user);
 
